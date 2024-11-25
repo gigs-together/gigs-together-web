@@ -11,7 +11,7 @@ export default function Header() {
           </h1>
           <div className="flex items-center space-x-4">
             <a href="https://t.me/concerts_together_bcn" target="_blank" rel="noopener noreferrer">
-              <FaTelegramPlane className="text-xl text-black-500 hover:text-black-700"/>
+              <FaTelegramPlane className="text-xl text-black-500 hover:text-black-700" />
             </a>
           </div>
         </div>
