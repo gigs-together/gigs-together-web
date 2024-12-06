@@ -1,15 +1,15 @@
+"use client"
 import styles from './page.module.css';
-import Calendar from '@/components/layout/calendar';
 import Header from '@/components/layout/header';
 import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import styled from 'styled-components';
 
 export function DaySection({ children, title }: { children: React.ReactNode, title: string }) {
   return (
-    <div className="flex flex-row gap-4 w-full">
-      <div className="text-2xl font-bold w-36 flex-shrink-0">
-        {title}
-        <Separator orientation="horizontal" />
-      </div>
+    <div className="flex flex-col gap-4 w-full pl-12">
+      <h3 className="text-2xl font-bold sticky">{title}</h3>
+      <Separator orientation="horizontal" />
       <div className="flex-wrap flex flex-row gap-4">
       {children}
       </div>
@@ -43,11 +43,28 @@ return (
   )
 }
 
+const StyledToggleGroup = styled(ToggleGroup)`
+  display: inline-flex;
+  flex-direction: column;
+`
+
+const days = ["9", "10", "11", "12", "13", "14", "15", "22", "29"]
+
 export default function Home() {
   return (
     <div className={styles.page}>
       <Header/>
       <main className={styles.main}>
+        <div className="flex flex-col items-center gap-4 p-1 border-radius-lg border-gray-200 fixed top-0 bg-white left-1 top-32">
+          <strong>Dec</strong>
+          <StyledToggleGroup type="single" orientation="vertical">
+            {days.map((day) => (
+              <ToggleGroupItem key={day} value={day} aria-label={day}>
+                {day}
+              </ToggleGroupItem>
+            ))}
+          </StyledToggleGroup>
+        </div>
         <DaySection title='December 9'>
           <Card cover="https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F905877343%2F2407230629043%2F1%2Foriginal.20241125-122702?crop=focalpoint&fit=crop&w=512&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=15e34abb8d4071b78436f10e3e5eae7a"/>
           <Card cover="https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F905877343%2F2407230629043%2F1%2Foriginal.20241125-122702?crop=focalpoint&fit=crop&w=512&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=15e34abb8d4071b78436f10e3e5eae7a"/>
