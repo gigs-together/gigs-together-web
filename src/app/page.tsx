@@ -7,9 +7,9 @@ import styled from 'styled-components';
 
 export function DaySection({ children, title }: { children: React.ReactNode, title: string }) {
   return (
-    <div className="flex flex-col gap-4 w-full pl-12">
-      <h3 className="text-2xl font-bold sticky">{title}</h3>
-      <Separator orientation="horizontal" />
+    <div className="flex flex-col w-full pl-12">
+      <h3 className="text-2xl font-bold text-gray-600 sticky">{title}</h3>
+      <Separator orientation="horizontal" className="mb-4 h-1 bg-gray-600" />
       <div className="flex-wrap flex flex-row gap-4">
       {children}
       </div>
