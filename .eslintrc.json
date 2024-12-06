@@ -1,3 +1,4 @@
 {
+  "globals": { "Telegram": "readonly" },
   "extends": ["next/core-web-vitals", "next/typescript"]
 }

@@ -28,17 +28,16 @@ async function handleProxy(req: NextRequest, { params }: RouteParams) {
       body: reqBody,
     });
 
-    const result = await response.text(); // Use `text()` to handle both JSON and non-JSON responses
-
     if (!response.ok) {
       // TODO
       // response.status || response.statusText
-      return NextResponse.json({ message: 'Backend error', details: result }, { status: response.status });
+      return NextResponse.json({ message: 'Backend error', details: response.statusText }, { status: response.status });
     }
 
-    return new NextResponse(result, {
-      status: response.status,
+    return new NextResponse(response.body, {
       headers: response.headers,
+      status: response.status,
+      statusText: response.statusText,
     });
   } catch (e) {
     console.error('Proxy Error:', e);
