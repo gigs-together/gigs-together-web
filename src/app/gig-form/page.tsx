@@ -56,7 +56,7 @@ export default function GigForm() {
         gig: values,
         telegramInitDataString: window.Telegram?.WebApp?.initData,
       };
-      await apiRequest('telegram/gig', 'POST', data);
+      await apiRequest('v1/telegram/gig', 'POST', data);
 
       toast({
         title: 'Gig submitted',
