@@ -18,8 +18,12 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
+  position: absolute;
+  top: 45px;
+  left: 0;
+  right: 0;
+  padding: 30px;
+  gap: 10px
 }
 
 .main ol {
