@@ -29,7 +29,7 @@ const formSchema = z.object({
   location: z.string().min(2, {
     message: 'Please enter location.',
   }),
-  tickets: z.string().url({
+  ticketsUrl: z.string().url({
     message: 'Please enter a valid ticket URL.',
   }),
 });
@@ -45,17 +45,18 @@ export default function GigForm() {
       title: '',
       date: '',
       location: '',
-      tickets: '',
+      ticketsUrl: '',
     },
   });
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     try {
-      await apiRequest('bot/gig', 'POST', {
-        ...values,
+      const data = {
+        gig: values,
         telegramInitDataString: window.Telegram?.WebApp?.initData,
-      });
+      };
+      await apiRequest('telegram/gig', 'POST', data);
 
       toast({
         title: 'Gig submitted',
@@ -143,7 +144,7 @@ export default function GigForm() {
               />
               <FormField
                 control={form.control}
-                name="tickets"
+                name="ticketsUrl"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
