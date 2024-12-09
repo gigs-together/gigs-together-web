@@ -25,6 +25,8 @@
   overflow: auto;
   width: 100%;
   height: calc(100vh - 45px);
+  padding-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .main ol {
