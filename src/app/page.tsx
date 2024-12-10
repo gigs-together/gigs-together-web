@@ -8,8 +8,9 @@ import './style.css';
 import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 const DEFAULT_LOCALE = 'en-US';
 
 const StyledToggleGroup = styled(ToggleGroup)`
@@ -145,19 +146,35 @@ export default function Home() {
       <Header/>
       <main className={styles.main}>
         <div className="flex flex-col items-center gap-1 px-1 border-radius-lg border-gray-200 fixed top-0 bg-white left-0 top-28 w-16">
-        <Popover>
-          <PopoverTrigger asChild>
+        <Sheet>
+          <SheetTrigger asChild>
+            {/* <Button variant="outline">{side}</Button> */}
             <button className="text-sm bg-black font-bold text-white uppercase w-10 h-10 rounded-full flex flex-col items-center justify-center">
               <FaRegCalendarAlt />
               <span className="text-xs">2024</span>
             </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-            />
-            </PopoverContent>
-          </Popover>
+          </SheetTrigger>
+          <SheetContent side="left">
+            <SheetHeader>
+              <SheetTitle>Select a date</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-2 items-center">
+              <h4 className="text-sm font-bold text-gray-500">December 2024</h4>
+              <Calendar
+                  mode="single"
+              />
+              <h4 className="text-sm font-bold text-gray-500">January 2025</h4>
+              <Calendar
+                  mode="single"
+                />
+            </div>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button type="submit">Save changes</Button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
 
           <StyledToggleGroup type="single" orientation="vertical" onValueChange={handleDayChange}>
             {months.map((day) => (
