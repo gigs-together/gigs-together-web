@@ -26,7 +26,6 @@
 
 .day-title h3 {
   transition: all .3s ease;
-  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
 }
 
 .day-title.day-title-sticky h3 {
