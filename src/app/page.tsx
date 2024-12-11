@@ -9,15 +9,6 @@ import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
 const DEFAULT_LOCALE = 'en-US';
 
-const StyledToggleGroupItem = styled(ToggleGroupItem)`
-  font-size: 0.8rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: 1px solid #a0a0a0;
-  color: #a0a0a0;
-`
-
 const events = [
   {
     date: "2024-12-09",
