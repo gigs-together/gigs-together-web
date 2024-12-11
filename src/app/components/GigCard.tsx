@@ -19,11 +19,11 @@ return (
         <a href="#">
           <span className="mb-2 tracking-tight dark:text-white font-bold">{title}</span>
         </a>
+        <div className="flex-1"></div>
         <p className="text-sm flex flex-row items-center gap-1"><FaUsers />{people}</p>
       </div>
       <div className="flex flex-row gap-2 items-center text-gray-500">
         Berlin, Germany
-        <div className="flex-1"></div>
       </div>
     </div>
   </div>
