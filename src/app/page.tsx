@@ -1,15 +1,21 @@
 "use client"
 import styles from './page.module.css';
 import Header from '@/components/layout/header';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import styled from 'styled-components';
 
 import './style.css';
 import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
 const DEFAULT_LOCALE = 'en-US';
 
-const events = [
+type Event = {
+  date: string;
+  cover: string;
+  title: string;
+  people: number;
+  id?: string;
+};
+
+const events: Event[] = [
   {
     date: "2024-12-09",
     cover: "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F905877343%2F2407230629043%2F1%2Foriginal.20241125-122702?crop=focalpoint&fit=crop&w=512&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=15e34abb8d4071b78436f10e3e5eae7a",
@@ -91,13 +97,13 @@ const events = [
 ];
 
 function generateUniqSerial(): string {  
-  return 'xxxx-xxxx-xxx-xxxx'.replace(/[x]/g, (c) => {  
+  return 'xxxx-xxxx-xxx-xxxx'.replace(/[x]/g, () => {  
       const r = Math.floor(Math.random() * 16);  
       return r.toString(16);  
 });  
 }
 
-const eventsByMonth: Record<string, typeof events> = {};
+const eventsByMonth: Record<string, Event[]> = {};
 
 events.forEach((event) => {
   event.id = generateUniqSerial();
@@ -118,10 +124,6 @@ function formatMonthTitle(date: string): string {
 }
 
 export default function Home() {
-
-  const handleDayChange = (value: string) => {
-    document.getElementById('day-' + value)?.scrollIntoView({ behavior: 'smooth' });
-  }
 
   return (
     <div className={styles.page}>
