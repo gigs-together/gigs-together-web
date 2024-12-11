@@ -7,11 +7,6 @@ import styled from 'styled-components';
 import './style.css';
 import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
-import { FaRegCalendarAlt } from "react-icons/fa";
-import { Calendar } from '@/components/ui/calendar';
-import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import TopForm from './components/TopForm';
 const DEFAULT_LOCALE = 'en-US';
 
 const StyledToggleGroup = styled(ToggleGroup)`
