@@ -16,9 +16,9 @@ const HorizontalForm = () => {
     >
       <Popover>
           <PopoverTrigger asChild>
-          <button className="flex items-center gap-2">
-            <FaRegCalendar />
-            2024-12-12
+          <button className="flex items-center gap-1 data-[state=open]:text-gray-700">
+            <FaRegCalendar className="h-4 w-4" />
+            {new Date('2024-12-12').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </button>
 
           </PopoverTrigger>
@@ -31,7 +31,7 @@ const HorizontalForm = () => {
 
 
       <div className="flex flex-col">
-        <button className="flex items-center gap-2">
+        <button className="flex items-center gap-1">
           <svg 
             className="h-4 w-4"
             xmlns="http://www.w3.org/2000/svg" 
