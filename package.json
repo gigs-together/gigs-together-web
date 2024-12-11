@@ -50,6 +50,7 @@
     "typescript": "^5"
   },
   "lint-staged": {
-    "*.js": "eslint --cache --quiet"
+    "*.[ts,tsx]": "eslint --cache --quiet"
   }
 }
+
