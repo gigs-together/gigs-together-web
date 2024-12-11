@@ -11,6 +11,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { Calendar } from '@/components/ui/calendar';
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import TopForm from './components/TopForm';
 const DEFAULT_LOCALE = 'en-US';
 
 const StyledToggleGroup = styled(ToggleGroup)`
@@ -145,10 +146,9 @@ export default function Home() {
     <div className={styles.page}>
       <Header/>
       <main className={styles.main}>
-        <div className="flex flex-col items-center gap-1 px-1 border-radius-lg border-gray-200 fixed top-0 bg-white left-0 top-28 w-16">
+        {/* <div className="flex flex-col items-center gap-1 px-1 border-radius-lg border-gray-200 fixed top-0 bg-white left-0 top-28 w-16">
         <Sheet>
           <SheetTrigger asChild>
-            {/* <Button variant="outline">{side}</Button> */}
             <button className="text-sm bg-black font-bold text-white uppercase w-10 h-10 rounded-full flex flex-col items-center justify-center">
               <FaRegCalendarAlt />
               <span className="text-xs">2024</span>
@@ -183,9 +183,10 @@ export default function Home() {
               </StyledToggleGroupItem>
             ))}
           </StyledToggleGroup>
-        </div>
-        {months.map((day) => (
-          <MonthSection
+        </div> */}
+        <div className="px-16 pb-4">
+          {months.map((day) => (
+            <MonthSection
             key={day.date}
             title={formatMonthTitle(day.date)}
             date={day.date}
@@ -194,7 +195,8 @@ export default function Home() {
               <Card key={event.id} cover={event.cover} title={event.title} people={event.people} />
             ))}
           </MonthSection>
-        ))} 
+          ))}
+        </div>
       </main>
     </div>
   );

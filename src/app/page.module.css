@@ -6,27 +6,19 @@
   --button-primary-hover: #383838;
   --button-secondary-hover: #f2f2f2;
 
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
   min-height: 100svh;
-  padding: 80px;
+  padding-top: 60px;
 }
 
 .main {
   display: flex;
   flex-direction: column;
-  position: absolute;
-  top: 45px;
-  left: 0;
-  right: 0;
   gap: 10px;
   overflow: auto;
-  width: 100%;
-  height: calc(100vh - 45px);
   padding-bottom: 20px;
   box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .main ol {
@@ -79,7 +71,6 @@ a.secondary {
 
 @media (max-width: 600px) {
   .page {
-    padding: 32px;
     padding-bottom: 80px;
   }
 

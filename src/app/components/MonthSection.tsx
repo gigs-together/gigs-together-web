@@ -41,9 +41,7 @@ export function MonthSection({ children, title, date }: MonthSectionProps) {
 
     dayObserver.observe(dayRef.current!);
 
-    let titleTop : number | null = null;
-
-    
+    let titleTop : number | null = null;    
 
     const titleObserver = new IntersectionObserver(
       ([entry]) => {
@@ -57,7 +55,7 @@ export function MonthSection({ children, title, date }: MonthSectionProps) {
         titleTop = rect.top;
 
         const isSticky = !isOffscreen && rect.top - rootRect.top < 5 && (delta <= 0 || root.scrollTop < 5);
-        titleElement.classList.toggle('day-title-sticky', isSticky);
+        //titleElement.classList.toggle('day-title-sticky', isSticky);
       },
       { threshold: [0, 0.0001, 0.1, 0.5, 0.9, 1],
         root,
@@ -73,13 +71,13 @@ export function MonthSection({ children, title, date }: MonthSectionProps) {
   }, []);
 
   return (
-    <div id={'day-' + date} ref={dayRef} className="flex flex-col w-full pl-16">
+    <div id={'day-' + date} ref={dayRef} className="flex flex-col w-full">
       <div className="day-title-container">
         <div ref={titleRef} className="day-title sticky top-0">
           <h3 className="text-2xl font-bold text-gray-600 top-0 uppercase">{title}</h3>
         </div>
       </div>
-      <div className="flex-wrap flex flex-row gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
         {children}
       </div>
     </div>
