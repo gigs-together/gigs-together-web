@@ -9,11 +9,6 @@ import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
 const DEFAULT_LOCALE = 'en-US';
 
-const StyledToggleGroup = styled(ToggleGroup)`
-  display: inline-flex;
-  flex-direction: column;
-`
-
 const StyledToggleGroupItem = styled(ToggleGroupItem)`
   font-size: 0.8rem;
   width: 2.5rem;
