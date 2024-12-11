@@ -184,7 +184,7 @@ export default function Home() {
             ))}
           </StyledToggleGroup>
         </div> */}
-        <div className="px-16 py-8">
+        <div className="px-8 md:px-16 py-8">
           {months.map((day) => (
             <MonthSection
             key={day.date}

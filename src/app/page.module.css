@@ -10,6 +10,10 @@
   padding-top: 45px;
 }
 
+:global(.header-expanded) .page {
+  padding-top: 328px;
+}
+
 .main {
   display: flex;
   flex-direction: column;
