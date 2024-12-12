@@ -1,34 +1,21 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import React from 'react';  
 import { cn } from '@/lib/utils';
-import { FaCalendar, FaRegCalendar } from 'react-icons/fa';
+import { FaRegCalendar } from 'react-icons/fa';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const HorizontalForm = () => {
-  const [expanded, setExpanded] = useState(false);
-  const handleExpand = (e) => {
-    e.preventDefault();
-    document.body.classList.toggle('header-expanded');
-    setExpanded((prev) => {
-      
-      return !prev;
-    });
-  }
-
   return (
     <form
       className={cn(
-        'flex w-fit items-start space-x-4 rounded-md sticky top-0'
+        'flex w-fit items-center space-x-4 rounded-md sticky top-0'
       )}
     >
-      {/* <Popover>
+      <Popover>
           <PopoverTrigger asChild>
-          <button className="flex items-center gap-1 data-[state=open]:text-gray-700">
-            <FaRegCalendar className="h-4 w-4" />
-            {new Date('2024-12-12').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          <button className="flex items-center gap-2">
+            <FaRegCalendar />
+            2024-12-12
           </button>
 
           </PopoverTrigger>
@@ -37,20 +24,11 @@ const HorizontalForm = () => {
               mode="single"
             />
             </PopoverContent>
-          </Popover> */}
+          </Popover>
 
-          <div className="flex flex-col items-center gap-1 data-[state=open]:text-gray-700 w-64">
-            <button className="flex items-center gap-1 data-[state=open]:text-gray-700" onClick={handleExpand}>
-              <FaRegCalendar className="h-4 w-4" />
-              {new Date('2024-12-12').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-            </button>
-            {expanded && <Calendar
-              mode="single"
-            />}
-          </div>
 
-      <div className="flex flex-col items-start justify-start w-16">
-        <button className="flex items-center gap-1">
+      <div className="flex flex-col">
+        <button className="flex items-center gap-2">
           <svg 
             className="h-4 w-4"
             xmlns="http://www.w3.org/2000/svg" 

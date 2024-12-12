@@ -1,7 +1,7 @@
-export async function apiRequest<T = any>(
+export async function apiRequest<T>(
   endpoint: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-  data?: any,
+  data?: T,
 ): Promise<T> {
   try {
     const response = await fetch(`/api/proxy/${endpoint}`, {

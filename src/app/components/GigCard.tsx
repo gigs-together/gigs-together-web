@@ -1,5 +1,5 @@
 import React from "react"
-import { FaUsers, FaArrowRight } from "react-icons/fa"
+import { FaUsers } from "react-icons/fa"
 
 type CardProps = {
   cover: string,

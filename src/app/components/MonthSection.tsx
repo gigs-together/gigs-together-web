@@ -41,20 +41,20 @@ export function MonthSection({ children, title, date }: MonthSectionProps) {
 
     dayObserver.observe(dayRef.current!);
 
-    let titleTop : number | null = null;    
+    //let titleTop : number | null = null;    
 
     const titleObserver = new IntersectionObserver(
       ([entry]) => {
-        const rect = entry.boundingClientRect;
+        //const rect = entry.boundingClientRect;
         const rootRect = entry.rootBounds;
 
         if (!rootRect) return;
 
         // When scrolling up we want to take off sticky
-        const delta = titleTop != null ? rect.top - titleTop : 0;
-        titleTop = rect.top;
+        //const delta = titleTop != null ? rect.top - titleTop : 0;
+        //titleTop = rect.top;
 
-        const isSticky = !isOffscreen && rect.top - rootRect.top < 5 && (delta <= 0 || root.scrollTop < 5);
+        //const isSticky = !isOffscreen && rect.top - rootRect.top < 5 && (delta <= 0 || root.scrollTop < 5);
         //titleElement.classList.toggle('day-title-sticky', isSticky);
       },
       { threshold: [0, 0.0001, 0.1, 0.5, 0.9, 1],
