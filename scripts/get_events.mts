@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dbConnect from '../src/lib/mongodb.mjs';
+import dbConnect from '../src/lib/mongodb';
 import { EventModel } from '../src/models/Event.js';
 
 const __filename = fileURLToPath(import.meta.url);
