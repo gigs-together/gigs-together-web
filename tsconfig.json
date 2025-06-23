@@ -10,6 +10,9 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -32,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "admin-server.mts", "scripts/get_events.mts", "src/models/Event.ts", "src/lib/mongodb.mts"  ],
   "exclude": [
     "node_modules"
   ]

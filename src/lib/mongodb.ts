@@ -1,0 +1,50 @@
+import mongoose from 'mongoose';
+
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://g2g:mYymK9tOErdVF2K7@cluster0.tjzzw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+if (!MONGODB_URI) {
+  throw new Error(
+    'Please define the MONGODB_URI environment variable inside .env.local'
+  );
+}
+
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+// Use type assertion to avoid global type issues
+const globalWithMongoose = global as typeof globalThis & {
+  mongoose: MongooseCache;
+};
+
+let cached = globalWithMongoose.mongoose;
+
+if (!cached) {
+  cached = globalWithMongoose.mongoose = { conn: null, promise: null };
+}
+
+async function dbConnect() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts);
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
+export default dbConnect; 
