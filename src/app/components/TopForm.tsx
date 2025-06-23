@@ -4,7 +4,18 @@ import { FaRegCalendar } from 'react-icons/fa';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-const HorizontalForm = () => {
+interface TopFormProps {
+  visibleEventDate?: string;
+}
+
+const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
+  const formatDisplayDate = (dateString?: string) => {
+    if (!dateString) return '2024-12-12'; // fallback
+    
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  };
+
   return (
     <form
       className={cn(
@@ -15,7 +26,7 @@ const HorizontalForm = () => {
           <PopoverTrigger asChild>
           <button className="flex items-center gap-2">
             <FaRegCalendar />
-            2024-12-12
+            {formatDisplayDate(visibleEventDate)}
           </button>
 
           </PopoverTrigger>
