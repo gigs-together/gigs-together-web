@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import styles from './page.module.css';
 import Header from '@/components/layout/header';
 
@@ -10,14 +10,16 @@ import { Event } from '@/types';
 
 const DEFAULT_LOCALE = 'en-US';
 
-function formatMonthTitle(date: string): string {
+const formatMonthTitle = (date: string): string => {
   return new Date(date).toLocaleString(DEFAULT_LOCALE, { month: 'long' }) + ' ' + date.split('-')[0].replace(/20/, '2k');
-}
+};
 
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [visibleEventDate, setVisibleEventDate] = useState<string | undefined>();
+  const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -30,8 +32,6 @@ export default function Home() {
         }
         
         const eventsData = await response.json();
-        console.log('Fetched events:', eventsData);
-        
         setEvents(eventsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -43,24 +43,83 @@ export default function Home() {
     fetchEvents();
   }, []);
 
-  // Group events by month
-  const eventsByMonth: Record<string, Event[]> = {};
-  events.forEach((event) => {
-    const monthYear = event.date.split('-').slice(0, 2).join('-');
-    eventsByMonth[monthYear] = eventsByMonth[monthYear] || [];
-    eventsByMonth[monthYear].push(event);
-  });
+  // Memoize event grouping to avoid recalculation on every render
+  const eventsByMonth = useMemo(() => {
+    const grouped: Record<string, Event[]> = {};
+    events.forEach((event) => {
+      const monthYear = event.date.split('-').slice(0, 2).join('-');
+      grouped[monthYear] = grouped[monthYear] || [];
+      grouped[monthYear].push(event);
+    });
+    return grouped;
+  }, [events]);
 
-  const months = Object.keys(eventsByMonth).sort().map((date) => {
-    return {
+  // Memoize months array
+  const months = useMemo(() => {
+    return Object.keys(eventsByMonth).sort().map((date) => ({
       date: date + '-01',
       events: eventsByMonth[date],
-    }
-  });
+    }));
+  }, [eventsByMonth]);
 
-  console.log('Events state:', events);
-  console.log('Events by month:', eventsByMonth);
-  console.log('Months:', months);
+  // Memoize the intersection observer callback
+  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    const visibleEvents: Array<{ element: Element; top: number }> = [];
+    
+    entries.forEach((entry: IntersectionObserverEntry) => {
+      if (entry.isIntersecting) {
+        const rect = entry.boundingClientRect;
+        const headerHeight = 80;
+        
+        if (rect.top >= headerHeight) {
+          visibleEvents.push({ element: entry.target, top: rect.top });
+        }
+      }
+    });
+
+    if (visibleEvents.length > 0) {
+      const topMostEvent = visibleEvents.reduce((prev, current) => 
+        prev.top < current.top ? prev : current
+      );
+      
+      const eventId = (topMostEvent.element as HTMLElement).getAttribute('data-event-id');
+      const event = events.find(e => e.id === eventId);
+      if (event) {
+        setVisibleEventDate(event.date);
+      }
+    } else if (events.length > 0) {
+      setVisibleEventDate(events[0].date);
+    }
+  }, [events]);
+
+  // Set up intersection observer to track visible events
+  useEffect(() => {
+    if (events.length === 0) return;
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: '-80px 0px -50% 0px',
+      threshold: 0
+    });
+
+    // Observe all event elements
+    eventRefs.current.forEach((element) => {
+      observer.observe(element);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [events, handleIntersection]);
+
+  // Register event element refs
+  const registerEventRef = useCallback((eventId: string, element: HTMLElement | null) => {
+    if (element) {
+      eventRefs.current.set(eventId, element);
+    } else {
+      eventRefs.current.delete(eventId);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -90,46 +149,8 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <Header/>
+      <Header earliestEventDate={visibleEventDate} />
       <main className={styles.main}>
-        {/* <div className="flex flex-col items-center gap-1 px-1 border-radius-lg border-gray-200 fixed top-0 bg-white left-0 top-28 w-16">
-        <Sheet>
-          <SheetTrigger asChild>
-            <button className="text-sm bg-black font-bold text-white uppercase w-10 h-10 rounded-full flex flex-col items-center justify-center">
-              <FaRegCalendarAlt />
-              <span className="text-xs">2024</span>
-            </button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <SheetHeader>
-              <SheetTitle>Select a date</SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-2 items-center">
-              <h4 className="text-sm font-bold text-gray-500">December 2024</h4>
-              <Calendar
-                  mode="single"
-              />
-              <h4 className="text-sm font-bold text-gray-500">January 2025</h4>
-              <Calendar
-                  mode="single"
-                />
-            </div>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button type="submit">Save changes</Button>
-              </SheetClose>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
-
-          <StyledToggleGroup type="single" orientation="vertical" onValueChange={handleDayChange}>
-            {months.map((day) => (
-              <StyledToggleGroupItem key={day.date} value={day.date} aria-label={day.date}>
-                {new Date(day.date).toLocaleString(DEFAULT_LOCALE, { month: 'short' })}
-              </StyledToggleGroupItem>
-            ))}
-          </StyledToggleGroup>
-        </div> */}
         <div className="px-8 md:px-16 py-8">
           {events.length === 0 ? (
             <div className="text-center py-12">
@@ -144,7 +165,13 @@ export default function Home() {
                 date={day.date}
               >
                 {day.events.map((event) => (
-                  <Card key={event.id} gig={event} />
+                  <div
+                    key={event.id}
+                    data-event-id={event.id}
+                    ref={(el) => registerEventRef(event.id, el)}
+                  >
+                    <Card gig={event} />
+                  </div>
                 ))}
               </MonthSection>
             ))
