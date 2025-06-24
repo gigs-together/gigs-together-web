@@ -1,6 +1,9 @@
-import { getModelForClass, prop } from '@typegoose/typegoose';
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import mongoose from 'mongoose';
 
+@modelOptions({
+  schemaOptions: { collection: 'events' }
+})
 export class Event {
   @prop({ required: true, type: String })
   public date!: string;
