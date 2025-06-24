@@ -1,4 +1,4 @@
-import { getModelForClass, prop, pre } from '@typegoose/typegoose';
+import { getModelForClass, prop, pre, modelOptions } from '@typegoose/typegoose';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
@@ -8,6 +8,9 @@ import bcrypt from 'bcrypt';
   }
 })
 
+@modelOptions({
+  schemaOptions: { collection: 'users' }
+})
 export class User {
   @prop({ required: true, unique: true, type: String })
   public email!: string;
