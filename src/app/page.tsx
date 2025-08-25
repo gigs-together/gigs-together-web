@@ -185,7 +185,7 @@ export default function Home() {
                     <div key={dateStr} className="contents">
                       <div className="col-span-full">
                         <div className="w-full border-b border-gray-200 my-6 relative">
-                          <span className="inline-flex items-center gap-2 -translate-y-1/2 bg-white pl-1 pr-2 text-base font-normal text-gray-800">
+                          <span className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
                             <FaRegCalendar className="text-gray-600" />
                             {formatFullDate(dateStr)}
                           </span>
