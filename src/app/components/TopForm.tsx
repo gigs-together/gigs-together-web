@@ -10,10 +10,9 @@ interface TopFormProps {
 
 const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
   const formatDisplayDate = (dateString?: string) => {
-    if (!dateString) return '2024-12-12'; // fallback
-    
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    if (!dateString) return '—';
+    const d = new Date(dateString);
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   return (
@@ -24,9 +23,11 @@ const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
     >
       <Popover>
           <PopoverTrigger asChild>
-          <button className="flex items-center gap-2">
-            <FaRegCalendar />
-            {formatDisplayDate(visibleEventDate)}
+          <button className="flex items-center gap-2 focus:outline-none">
+            <span className="inline-flex items-center gap-2 text-base font-normal text-gray-800 pl-1 pr-2">
+              <FaRegCalendar className="text-gray-600" />
+              {formatDisplayDate(visibleEventDate)}
+            </span>
           </button>
 
           </PopoverTrigger>

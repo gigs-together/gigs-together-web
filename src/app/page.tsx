@@ -7,6 +7,7 @@ import './style.css';
 import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
 import { Event } from '@/types';
+import { FaRegCalendar } from 'react-icons/fa';
 
 const DEFAULT_LOCALE = 'en-US';
 
@@ -14,9 +15,10 @@ const formatMonthTitle = (date: string): string => {
   return new Date(date).toLocaleString(DEFAULT_LOCALE, { month: 'long' }) + ' ' + date.split('-')[0].replace(/20/, '2k');
 };
 
-const formatDayTitle = (date: string): string => {
-  const d = new Date(date);
-  return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short', day: 'numeric', month: 'short' });
+const formatFullDate = (dateString?: string) => {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 };
 
 export default function Home() {
@@ -182,9 +184,10 @@ export default function Home() {
                   {orderedDates.map(dateStr => (
                     <div key={dateStr} className="contents">
                       <div className="col-span-full">
-                        <div className="w-full border-b border-gray-200 my-4 relative">
-                          <span className="bg-white px-3 py-1 text-sm font-medium text-gray-600 inline-block -translate-y-1/2">
-                            {formatDayTitle(dateStr)}
+                        <div className="w-full border-b border-gray-200 my-6 relative">
+                          <span className="inline-flex items-center gap-2 -translate-y-1/2 bg-white pl-1 pr-2 text-base font-normal text-gray-800">
+                            <FaRegCalendar className="text-gray-600" />
+                            {formatFullDate(dateStr)}
                           </span>
                         </div>
                       </div>
