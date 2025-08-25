@@ -14,6 +14,11 @@ const formatMonthTitle = (date: string): string => {
   return new Date(date).toLocaleString(DEFAULT_LOCALE, { month: 'long' }) + ' ' + date.split('-')[0].replace(/20/, '2k');
 };
 
+const formatDayTitle = (date: string): string => {
+  const d = new Date(date);
+  return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short', day: 'numeric', month: 'short' });
+};
+
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -158,23 +163,45 @@ export default function Home() {
               <p className="text-gray-500 mt-2">Check back later for upcoming events!</p>
             </div>
           ) : (
-            months.map((day) => (
-              <MonthSection
-                key={day.date}
-                title={formatMonthTitle(day.date)}
-                date={day.date}
-              >
-                {day.events.map((event) => (
-                  <div
-                    key={event.id}
-                    data-event-id={event.id}
-                    ref={(el) => registerEventRef(event.id, el)}
-                  >
-                    <Card gig={event} />
-                  </div>
-                ))}
-              </MonthSection>
-            ))
+            months.map((day) => {
+              // Group events inside the month by full date (YYYY-MM-DD)
+              const eventsByDay: Record<string, Event[]> = {};
+              day.events.forEach(ev => {
+                eventsByDay[ev.date] = eventsByDay[ev.date] || [];
+                eventsByDay[ev.date].push(ev);
+              });
+
+              const orderedDates = Object.keys(eventsByDay).sort();
+
+              return (
+                <MonthSection
+                  key={day.date}
+                  title={formatMonthTitle(day.date)}
+                  date={day.date}
+                >
+                  {orderedDates.map(dateStr => (
+                    <div key={dateStr} className="contents">
+                      <div className="col-span-full">
+                        <div className="w-full border-b border-gray-200 my-4 relative">
+                          <span className="bg-white px-3 py-1 text-sm font-medium text-gray-600 inline-block -translate-y-1/2">
+                            {formatDayTitle(dateStr)}
+                          </span>
+                        </div>
+                      </div>
+                      {eventsByDay[dateStr].map((event) => (
+                        <div
+                          key={event.id}
+                          data-event-id={event.id}
+                          ref={(el) => registerEventRef(event.id, el)}
+                        >
+                          <Card gig={event} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </MonthSection>
+              );
+            })
           )}
         </div>
       </main>
