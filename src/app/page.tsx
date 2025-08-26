@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import styles from './page.module.css';
 import Header from '@/components/layout/header';
@@ -33,11 +33,11 @@ export default function Home() {
       try {
         setLoading(true);
         const response = await fetch('/api/admin/events?_start=0&_end=1000&_sort=date&_order=ASC');
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch events');
         }
-        
+
         const eventsData = await response.json();
         setEvents(eventsData);
       } catch (err) {
@@ -72,12 +72,12 @@ export default function Home() {
   // Memoize the intersection observer callback
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     const visibleEvents: Array<{ element: Element; top: number }> = [];
-    
+
     entries.forEach((entry: IntersectionObserverEntry) => {
       if (entry.isIntersecting) {
         const rect = entry.boundingClientRect;
         const headerHeight = 80;
-        
+
         if (rect.top >= headerHeight) {
           visibleEvents.push({ element: entry.target, top: rect.top });
         }
@@ -85,10 +85,10 @@ export default function Home() {
     });
 
     if (visibleEvents.length > 0) {
-      const topMostEvent = visibleEvents.reduce((prev, current) => 
-        prev.top < current.top ? prev : current
+      const topMostEvent = visibleEvents.reduce((prev, current) =>
+        prev.top < current.top ? prev : current,
       );
-      
+
       const eventId = (topMostEvent.element as HTMLElement).getAttribute('data-event-id');
       const event = events.find(e => e.id === eventId);
       if (event) {
@@ -106,7 +106,7 @@ export default function Home() {
     const observer = new IntersectionObserver(handleIntersection, {
       root: null,
       rootMargin: '-80px 0px -50% 0px',
-      threshold: 0
+      threshold: 0,
     });
 
     // Observe all event elements
@@ -131,7 +131,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <Header/>
+        <Header />
         <main className={styles.main}>
           <div className="flex justify-center items-center h-96">
             <div className="text-lg">Loading events...</div>
@@ -144,7 +144,7 @@ export default function Home() {
   if (error) {
     return (
       <div className={styles.page}>
-        <Header/>
+        <Header />
         <main className={styles.main}>
           <div className="flex justify-center items-center h-96">
             <div className="text-lg text-red-600">Error: {error}</div>
@@ -181,16 +181,19 @@ export default function Home() {
                   title={formatMonthTitle(day.date)}
                   date={day.date}
                 >
-                  {orderedDates.map(dateStr => (
+                  {orderedDates.map((dateStr, i) => (
                     <div key={dateStr} className="contents">
-                      <div className="col-span-full">
-                        <div className="w-full border-b border-gray-200 my-6 relative">
-                          <span className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
+                      {i !== 0 && (
+                        <div className="col-span-full">
+                          <div className="w-full border-b border-gray-200 my-6 relative">
+                          <span
+                            className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
                             <FaRegCalendar className="text-gray-600" />
                             {formatFullDate(dateStr)}
                           </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       {eventsByDay[dateStr].map((event) => (
                         <div
                           key={event.id}
