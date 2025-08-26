@@ -24,7 +24,7 @@ const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
       <Popover>
           <PopoverTrigger asChild>
           <button className="flex items-center gap-2 focus:outline-none">
-            <span className="inline-flex items-center gap-2 text-base font-normal text-gray-800 pl-1 pr-2">
+            <span className="inline-flex items-center gap-2 text-base font-normal text-gray-800 px-2">
               <FaRegCalendar className="text-gray-600" />
               {formatDisplayDate(visibleEventDate)}
             </span>
