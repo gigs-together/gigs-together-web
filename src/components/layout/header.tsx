@@ -42,7 +42,7 @@ export default function Header({ earliestEventDate }: HeaderProps) {
               </svg>
               Barcelona
             </button>
-            <a href="https://t.me/concerts_together_bcn" target="_blank" rel="noopener noreferrer">
+            <a href="https://t.me/gigs_together_bcn" target="_blank" rel="noopener noreferrer">
               <FaTelegramPlane className="text-xl text-black-500 hover:text-black-700" />
             </a>
           </div>
