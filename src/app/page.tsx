@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import styles from './page.module.css';
 import Header from '@/components/layout/header';
+import { toLocalYMD } from '@/lib/utils';
 
 import './style.css';
 import { MonthSection } from './components/MonthSection';
@@ -19,19 +20,6 @@ const formatFullDate = (dateString?: string) => {
   if (!dateString) return '';
   const d = new Date(dateString);
   return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-};
-
-const toLocalYMD = (d: Date | string) => {
-  // If a Date is passed (e.g., from DayPicker) — use local date parts
-  if (d instanceof Date) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
-  // If a "YYYY-MM-DD" string is passed — parse manually, without new Date(...) (to avoid timezone shifts)
-  const [y, m, day] = d.split('-').map(Number);
-  return `${y}-${String(m).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 function useHeaderHeight(selector = '[data-app-header]', fallback = 44) {
@@ -76,6 +64,13 @@ export default function Home() {
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
   const scrollContainerRef = useRef<HTMLElement>();
   const headerOffsetHeightRef = useRef<number>();
+
+  // list of dates that actually have events (YYYY-MM-DD) — used to disable other days in the calendar
+  const availableDates = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of events) set.add(e.date);
+    return Array.from(set).sort();
+  }, [events]);
 
   useEffect(() => {
     headerOffsetHeightRef.current = headerH;
@@ -240,7 +235,7 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <Header earliestEventDate={visibleEventDate} onDayClick={handleDayClick} />
+      <Header earliestEventDate={visibleEventDate} onDayClick={handleDayClick} availableDates={availableDates} />
       <main className={styles.main} ref={(el) => {
         if (el) scrollContainerRef.current = el;
       }}>

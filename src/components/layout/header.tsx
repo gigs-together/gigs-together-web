@@ -5,9 +5,10 @@ import { FaTelegramPlane } from 'react-icons/fa';
 interface HeaderProps {
   earliestEventDate?: string;
   onDayClick?: (day: Date) => void;
+  availableDates?: string[]; // formatted as YYYY-MM-DD
 }
 
-export default function Header({ earliestEventDate, onDayClick }: HeaderProps) {
+export default function Header({ earliestEventDate, onDayClick, availableDates }: HeaderProps) {
   return (
     <header data-app-header className="bg-background border-b fixed top-0 left-0 w-full z-50">
       <div className="w-full px-4 py-2">
@@ -19,7 +20,7 @@ export default function Header({ earliestEventDate, onDayClick }: HeaderProps) {
           </div>
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
-            <TopForm visibleEventDate={earliestEventDate} onDayClick={onDayClick}/>
+            <TopForm visibleEventDate={earliestEventDate} onDayClick={onDayClick} availableDates={availableDates} />
           </div>
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4 basis-0 flex-1 shrink-1 justify-end">
