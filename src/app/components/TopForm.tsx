@@ -36,8 +36,8 @@ const TopForm = ({ visibleEventDate, onDayClick, availableDates }: TopFormProps)
       <Popover>
           <PopoverTrigger asChild>
           <button className="flex items-center gap-2 focus:outline-none">
-            <span className="inline-flex items-center gap-2 text-base font-normal text-gray-800 px-2">
-              <FaRegCalendar className="text-gray-600" />
+            <span className="inline-flex items-center gap-2 text-base font-normal text-gray-800 px-2 w-[20ch]">
+              <FaRegCalendar className="text-gray-600"/>
               {formatDisplayDate(visibleEventDate)}
             </span>
           </button>

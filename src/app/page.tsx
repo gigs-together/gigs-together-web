@@ -276,7 +276,7 @@ export default function Home() {
                             className="w-full border-b border-gray-200 my-6 relative scroll-mt-[var(--header-h)]"
                           >
                             <span
-                              className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
+                              className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[20ch]">
                               <FaRegCalendar className="text-gray-600" />
                               {formatFullDate(dateStr)}
                             </span>
