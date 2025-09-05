@@ -71,32 +71,24 @@ export default function Home() {
 
   // Memoize the intersection observer callback
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    const visibleEvents: Array<{ element: Element; top: number }> = [];
+    // собираем кандидатов, уже с учётом rootMargin
+    const candidates: Array<{ el: Element; top: number }> = [];
 
-    entries.forEach((entry: IntersectionObserverEntry) => {
-      if (entry.isIntersecting) {
-        const rect = entry.boundingClientRect;
-        const headerHeight = 80;
-
-        if (rect.top >= headerHeight) {
-          visibleEvents.push({ element: entry.target, top: rect.top });
-        }
-      }
-    });
-
-    if (visibleEvents.length > 0) {
-      const topMostEvent = visibleEvents.reduce((prev, current) =>
-        prev.top < current.top ? prev : current,
-      );
-
-      const eventId = (topMostEvent.element as HTMLElement).getAttribute('data-event-id');
-      const event = events.find(e => e.id === eventId);
-      if (event) {
-        setVisibleEventDate(event.date);
-      }
-    } else if (events.length > 0) {
-      setVisibleEventDate(events[0].date);
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const top = entry.boundingClientRect.top; // уже "сдвинут" rootMargin
+      if (top >= 0) candidates.push({ el: entry.target, top });
     }
+
+    // если в этом тике ничего не пересеклось — оставляем текущую дату как есть
+    if (candidates.length === 0) return;
+
+    // ближайший к верхней границе
+    const { el } = candidates.reduce((a, b) => (a.top <= b.top ? a : b));
+    const eventId = (el as HTMLElement).dataset.eventId ?? '';
+
+    const event = events.find(e => String(e.id) === eventId);
+    if (event) setVisibleEventDate(event.date);
   }, [events]);
 
   // Set up intersection observer to track visible events
@@ -166,7 +158,6 @@ export default function Home() {
             </div>
           ) : (
             months.map((day) => {
-              // Group events inside the month by full date (YYYY-MM-DD)
               const eventsByDay: Record<string, Event[]> = {};
               day.events.forEach(ev => {
                 eventsByDay[ev.date] = eventsByDay[ev.date] || [];
