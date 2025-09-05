@@ -26,7 +26,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [visibleEventDate, setVisibleEventDate] = useState<string | undefined>();
+
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const scrollContainerRef = useRef<HTMLElement>();
+  const headerOffsetHeightRef = useRef<number>();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -69,24 +72,46 @@ export default function Home() {
     }));
   }, [eventsByMonth]);
 
-  // Memoize the intersection observer callback
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    // собираем кандидатов, уже с учётом rootMargin
-    const candidates: Array<{ el: Element; top: number }> = [];
+    // 1) collect intersecting elements (root/rootMargin are already applied by IO)
+    const below: Array<{ el: Element; top: number }> = [];
+    const above: Array<{ el: Element; top: number }> = [];
 
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
-      const top = entry.boundingClientRect.top; // уже "сдвинут" rootMargin
-      if (top >= 0) candidates.push({ el: entry.target, top });
+      const top = entry.boundingClientRect.top; // 0 = line just below the header (thanks to rootMargin)
+      if (top >= 0) below.push({ el: entry.target, top });
+      else above.push({ el: entry.target, top });
     }
 
-    // если в этом тике ничего не пересеклось — оставляем текущую дату как есть
-    if (candidates.length === 0) return;
+    // 2) pick the target: first try the closest element below the header,
+    // otherwise pick the closest element above the header
+    let targetEl: Element | null = null;
+    if (below.length) {
+      targetEl = below.reduce((a, b) => (a.top <= b.top ? a : b)).el; // smallest top >= 0
+    } else if (above.length) {
+      targetEl = above.reduce((a, b) => (a.top >= b.top ? a : b)).el; // largest top < 0
+    }
 
-    // ближайший к верхней границе
-    const { el } = candidates.reduce((a, b) => (a.top <= b.top ? a : b));
-    const eventId = (el as HTMLElement).dataset.eventId ?? '';
+    // 3) if nothing is available in this tick — do a DOM fallback
+    // (but don't reset the date to avoid "jumping")
+    if (!targetEl && scrollContainerRef.current) {
+      const headerH = headerOffsetHeightRef.current ?? 0;
+      const all = Array.from(
+        scrollContainerRef.current.querySelectorAll<HTMLElement>('[data-event-id]')
+      );
+      const withTop = all
+        .map(el => ({ el, top: el.getBoundingClientRect().top - headerH }));
 
+      const firstBelow = withTop.filter(x => x.top >= 0).sort((a,b) => a.top - b.top)[0];
+      const closestAbove = withTop.filter(x => x.top < 0).sort((a,b) => b.top - a.top)[0];
+
+      targetEl = (firstBelow ?? closestAbove)?.el ?? null;
+    }
+
+    if (!targetEl) return; // do nothing if no candidate found — avoids flicker
+
+    const eventId = (targetEl as HTMLElement).dataset.eventId ?? '';
     const event = events.find(e => String(e.id) === eventId);
     if (event) setVisibleEventDate(event.date);
   }, [events]);
