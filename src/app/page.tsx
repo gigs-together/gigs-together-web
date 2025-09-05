@@ -171,9 +171,13 @@ export default function Home() {
     );
   }
 
+  const handleDayClick = (day: Date) => {
+    console.log('clicked date:', day);
+  }
+
   return (
     <div className={styles.page}>
-      <Header earliestEventDate={visibleEventDate} />
+      <Header earliestEventDate={visibleEventDate} onDayClick={handleDayClick}/>
       <main className={styles.main}>
         <div className="px-8 md:px-16 py-8">
           {events.length === 0 ? (

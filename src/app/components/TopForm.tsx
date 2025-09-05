@@ -1,14 +1,16 @@
-import React from 'react';  
+import React, { MouseEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { FaRegCalendar } from 'react-icons/fa';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ActiveModifiers } from 'react-day-picker';
 
 interface TopFormProps {
   visibleEventDate?: string;
+  onDayClick?: (day: Date, activeModifiers?: ActiveModifiers, e?: MouseEvent) => void;
 }
 
-const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
+const TopForm = ({ visibleEventDate, onDayClick }: TopFormProps) => {
   const formatDisplayDate = (dateString?: string) => {
     if (!dateString) return '—';
     const d = new Date(dateString);
@@ -34,6 +36,7 @@ const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"
+              onDayClick={onDayClick}
             />
             </PopoverContent>
           </Popover>
@@ -41,4 +44,4 @@ const HorizontalForm = ({ visibleEventDate }: TopFormProps) => {
   );
 };
 
-export default HorizontalForm;
+export default TopForm;
