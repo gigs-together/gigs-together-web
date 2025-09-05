@@ -21,7 +21,53 @@ const formatFullDate = (dateString?: string) => {
   return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 };
 
+const toLocalYMD = (d: Date | string) => {
+  // If a Date is passed (e.g., from DayPicker) — use local date parts
+  if (d instanceof Date) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  // If a "YYYY-MM-DD" string is passed — parse manually, without new Date(...) (to avoid timezone shifts)
+  const [y, m, day] = d.split('-').map(Number);
+  return `${y}-${String(m).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
+function useHeaderHeight(selector = '[data-app-header]', fallback = 44) {
+  const [h, setH] = useState(fallback);
+
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>(selector);
+    if (!el) {
+      // Still set the CSS variable using the fallback
+      document.documentElement.style.setProperty('--header-h', `${fallback}px`);
+      return;
+    }
+
+    const apply = (px: number) => {
+      setH(px);
+      // Store the variable globally; you can set it on your scroll container if it's separate
+      document.documentElement.style.setProperty('--header-h', `${px}px`);
+    };
+
+    // Initial measurement
+    apply(el.offsetHeight);
+
+    const ro = new ResizeObserver(() => {
+      apply(el.offsetHeight);
+    });
+    ro.observe(el);
+
+    return () => ro.disconnect();
+  }, [selector, fallback]);
+
+  return h; // value in pixels
+}
+
 export default function Home() {
+  const headerH = useHeaderHeight(); // will pick [data-app-header], fallback 44
+
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +76,10 @@ export default function Home() {
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
   const scrollContainerRef = useRef<HTMLElement>();
   const headerOffsetHeightRef = useRef<number>();
+
+  useEffect(() => {
+    headerOffsetHeightRef.current = headerH;
+  }, [headerH]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -98,13 +148,13 @@ export default function Home() {
     if (!targetEl && scrollContainerRef.current) {
       const headerH = headerOffsetHeightRef.current ?? 0;
       const all = Array.from(
-        scrollContainerRef.current.querySelectorAll<HTMLElement>('[data-event-id]')
+        scrollContainerRef.current.querySelectorAll<HTMLElement>('[data-event-id]'),
       );
       const withTop = all
         .map(el => ({ el, top: el.getBoundingClientRect().top - headerH }));
 
-      const firstBelow = withTop.filter(x => x.top >= 0).sort((a,b) => a.top - b.top)[0];
-      const closestAbove = withTop.filter(x => x.top < 0).sort((a,b) => b.top - a.top)[0];
+      const firstBelow = withTop.filter(x => x.top >= 0).sort((a, b) => a.top - b.top)[0];
+      const closestAbove = withTop.filter(x => x.top < 0).sort((a, b) => b.top - a.top)[0];
 
       targetEl = (firstBelow ?? closestAbove)?.el ?? null;
     }
@@ -122,7 +172,7 @@ export default function Home() {
 
     const observer = new IntersectionObserver(handleIntersection, {
       root: null,
-      rootMargin: '-80px 0px -50% 0px',
+      rootMargin: `-${headerH}px 0px -50% 0px`,
       threshold: 0,
     });
 
@@ -131,10 +181,8 @@ export default function Home() {
       observer.observe(element);
     });
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [events, handleIntersection]);
+    return () => observer.disconnect();
+  }, [events, handleIntersection, headerH]);
 
   // Register event element refs
   const registerEventRef = useCallback((eventId: string, element: HTMLElement | null) => {
@@ -172,13 +220,30 @@ export default function Home() {
   }
 
   const handleDayClick = (day: Date) => {
-    console.log('clicked date:', day);
-  }
+    const key = toLocalYMD(day);
+
+    // First, try to find an explicit anchor by date (where you added data-date and scroll-mt-[44px])
+    let target = document.querySelector<HTMLElement>(`[data-date="${key}"]`);
+
+    // Fallback: if there is no anchor, jump to the first card for this date
+    if (!target) {
+      const firstEvent = events.find(e => e.date === key);
+      if (firstEvent) {
+        target = eventRefs.current.get(String(firstEvent.id)) || null;
+      }
+    }
+
+    if (!target) return;
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+  };
 
   return (
     <div className={styles.page}>
-      <Header earliestEventDate={visibleEventDate} onDayClick={handleDayClick}/>
-      <main className={styles.main}>
+      <Header earliestEventDate={visibleEventDate} onDayClick={handleDayClick} />
+      <main className={styles.main} ref={(el) => {
+        if (el) scrollContainerRef.current = el;
+      }}>
         <div className="px-8 md:px-16 py-8">
           {events.length === 0 ? (
             <div className="text-center py-12">
@@ -203,17 +268,27 @@ export default function Home() {
                 >
                   {orderedDates.map((dateStr, i) => (
                     <div key={dateStr} className="contents">
-                      {i !== 0 && (
+                      {i === 0 ? (
+                        <div
+                          data-date={dateStr}
+                          className="col-span-full h-0 overflow-hidden scroll-mt-[var(--header-h)]"
+                          aria-hidden
+                        />
+                      ) : (
                         <div className="col-span-full">
-                          <div className="w-full border-b border-gray-200 my-6 relative">
-                          <span
-                            className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
-                            <FaRegCalendar className="text-gray-600" />
-                            {formatFullDate(dateStr)}
-                          </span>
+                          <div
+                            data-date={dateStr}
+                            className="w-full border-b border-gray-200 my-6 relative scroll-mt-[var(--header-h)]"
+                          >
+                            <span
+                              className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
+                              <FaRegCalendar className="text-gray-600" />
+                              {formatFullDate(dateStr)}
+                            </span>
                           </div>
                         </div>
                       )}
+
                       {eventsByDay[dateStr].map((event) => (
                         <div
                           key={event.id}
@@ -225,6 +300,7 @@ export default function Home() {
                       ))}
                     </div>
                   ))}
+
                 </MonthSection>
               );
             })

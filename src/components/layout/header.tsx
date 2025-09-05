@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export default function Header({ earliestEventDate, onDayClick }: HeaderProps) {
   return (
-    <header className="bg-background border-b fixed top-0 left-0 w-full z-50">
+    <header data-app-header className="bg-background border-b fixed top-0 left-0 w-full z-50">
       <div className="w-full px-4 py-2">
         <div className="flex items-center w-full">
           <div className="basis-0 flex-1 shrink-1">
@@ -49,7 +49,6 @@ export default function Header({ earliestEventDate, onDayClick }: HeaderProps) {
           </div>
         </div>
       </div>
-
     </header>
   );
 }
