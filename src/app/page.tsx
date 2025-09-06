@@ -67,6 +67,7 @@ export default function Home() {
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
   const scrollContainerRef = useRef<HTMLElement>();
   const headerOffsetHeightRef = useRef<number>();
+  const anchorsRef = useRef<HTMLElement[]>([]);
 
   // list of dates that actually have events (YYYY-MM-DD) — used to disable other days in the calendar
   const availableDates = useMemo(() => {
@@ -111,7 +112,6 @@ export default function Home() {
     fetchEvents();
   }, []);
 
-  // Memoize event grouping to avoid recalculation on every render
   const eventsByMonth = useMemo(() => {
     const grouped: Record<string, Event[]> = {};
     events.forEach((event) => {
@@ -122,7 +122,6 @@ export default function Home() {
     return grouped;
   }, [events]);
 
-  // Memoize months array
   const months = useMemo(() => {
     return Object.keys(eventsByMonth).sort().map((date) => ({
       date: date + '-01',
@@ -130,67 +129,53 @@ export default function Home() {
     }));
   }, [eventsByMonth]);
 
-  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    // 1) collect intersecting elements (root/rootMargin are already applied by IO)
-    const below: Array<{ el: Element; top: number }> = [];
-    const above: Array<{ el: Element; top: number }> = [];
+  const computeActiveDate = useCallback(() => {
+    const headerH = headerOffsetHeightRef.current ?? 0;
+    const anchors = anchorsRef.current;
+    if (!anchors || anchors.length === 0) return;
 
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      const top = entry.boundingClientRect.top; // 0 = line just below the header (thanks to rootMargin)
-      if (top >= 0) below.push({ el: entry.target, top });
-      else above.push({ el: entry.target, top });
-    }
+    const withTop = anchors.map(el => ({ el, top: el.getBoundingClientRect().top - headerH }));
+    const firstBelow = withTop.filter(x => x.top >= 0).sort((a, b) => a.top - b.top)[0];
+    const closestAbove = withTop.filter(x => x.top < 0).sort((a, b) => b.top - a.top)[0];
+    const targetEl = (closestAbove ?? firstBelow)?.el as HTMLElement | undefined;
+    const dateAttr = targetEl?.dataset.date;
+    if (dateAttr) setRawVisibleEventDate(prev => (prev === dateAttr ? prev : dateAttr));
+  }, []);
 
-    // 2) pick the target: first try the closest element below the header,
-    // otherwise pick the closest element above the header
-    let targetEl: Element | null = null;
-    if (below.length) {
-      targetEl = below.reduce((a, b) => (a.top <= b.top ? a : b)).el; // smallest top >= 0
-    } else if (above.length) {
-      targetEl = above.reduce((a, b) => (a.top >= b.top ? a : b)).el; // largest top < 0
-    }
-
-    // 3) if nothing is available in this tick — do a DOM fallback
-    // (but don't reset the date to avoid "jumping")
-    if (!targetEl && scrollContainerRef.current) {
-      const headerH = headerOffsetHeightRef.current ?? 0;
-      const all = Array.from(
-        scrollContainerRef.current.querySelectorAll<HTMLElement>('[data-event-id]'),
-      );
-      const withTop = all
-        .map(el => ({ el, top: el.getBoundingClientRect().top - headerH }));
-
-      const firstBelow = withTop.filter(x => x.top >= 0).sort((a, b) => a.top - b.top)[0];
-      const closestAbove = withTop.filter(x => x.top < 0).sort((a, b) => b.top - a.top)[0];
-
-      targetEl = (firstBelow ?? closestAbove)?.el ?? null;
-    }
-
-    if (!targetEl) return; // do nothing if no candidate found — avoids flicker
-
-    const eventId = (targetEl as HTMLElement).dataset.eventId ?? '';
-    const event = events.find(e => String(e.id) === eventId);
-    if (event) setRawVisibleEventDate(event.date);
-  }, [events]);
-
-  // Set up intersection observer to track visible events
+  // Observe anchors list after events render and compute initial active date
   useEffect(() => {
-    if (events.length === 0) return;
+    // Use [data-date] anchors as the single source of truth
+    anchorsRef.current = Array.from(document.querySelectorAll('[data-date]')) as HTMLElement[];
+    // Compute once after anchors update
+    computeActiveDate();
+  }, [events, computeActiveDate]);
 
-    const observer = new IntersectionObserver(handleIntersection, {
-      root: null,
-      rootMargin: `-${headerH}px 0px -50% 0px`,
-      threshold: 0,
-    });
+  // Scroll + resize handler using rAF for stability
+  useEffect(() => {
+    let ticking = false, frameId: number | undefined;
 
-    // Observe all event elements
-    eventRefs.current.forEach((element) => {
-      observer.observe(element);
-    });
+    const onScrollOrResize = () => {
+      if (ticking) return;
+      ticking = true;
+      frameId = requestAnimationFrame(() => {
+        computeActiveDate();
+        ticking = false;
+      });
+    };
 
-    return () => observer.disconnect();
-  }, [events, handleIntersection, headerH]);
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize);
+
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize);
+      window.removeEventListener('resize', onScrollOrResize);
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+      ;
+
+    };
+  }, [computeActiveDate]);
 
   // Register event element refs
   const registerEventRef = useCallback((eventId: string, element: HTMLElement | null) => {
@@ -317,4 +302,4 @@ export default function Home() {
       </main>
     </div>
   );
-}
+};
