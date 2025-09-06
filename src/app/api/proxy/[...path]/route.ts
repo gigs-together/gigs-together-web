@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.API_BASE_URL;
 
@@ -31,7 +32,10 @@ async function handleProxy(req: NextRequest, { params }: RouteParams) {
     if (!response.ok) {
       // TODO
       // response.status || response.statusText
-      return NextResponse.json({ message: 'Backend error', details: response.statusText }, { status: response.status });
+      return NextResponse.json(
+        { message: 'Backend error', details: response.statusText },
+        { status: response.status },
+      );
     }
 
     return new NextResponse(response.body, {

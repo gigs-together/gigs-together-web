@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { UserModel } from '@/models/User';
 
@@ -13,12 +14,12 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     await dbConnect();
-    
+
     const user = await UserModel.findById(params.id).select('-password');
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({
       ...user.toObject(),
       id: user._id.toString(),
@@ -32,18 +33,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     await dbConnect();
-    
+
     const body = await request.json();
-    const user = await UserModel.findByIdAndUpdate(
-      params.id,
-      body,
-      { new: true, runValidators: true }
-    ).select('-password');
-    
+    const user = await UserModel.findByIdAndUpdate(params.id, body, {
+      new: true,
+      runValidators: true,
+    }).select('-password');
+
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({
       ...user.toObject(),
       id: user._id.toString(),
@@ -57,12 +57,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     await dbConnect();
-    
+
     const user = await UserModel.findByIdAndDelete(params.id);
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({
       ...user.toObject(),
       id: user._id.toString(),
@@ -71,4 +71,4 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     console.error('Error deleting user:', error);
     return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
   }
-} 
+}

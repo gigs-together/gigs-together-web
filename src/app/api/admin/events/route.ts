@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { EventModel } from '@/models/Event';
 
@@ -7,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    
+
     const { searchParams } = new URL(request.url);
     const _start = parseInt(searchParams.get('_start') || '0');
     const _end = parseInt(searchParams.get('_end') || '10');
@@ -20,20 +21,19 @@ export async function GET(request: NextRequest) {
       query = {
         $or: [
           { title: { $regex: q, $options: 'i' } },
-          { venueAddress: { $regex: q, $options: 'i' } }
-        ]
+          { venueAddress: { $regex: q, $options: 'i' } },
+        ],
       };
     }
 
     const sortOrder = _order === 'ASC' ? 1 : -1;
-    const events = await EventModel
-      .find(query)
+    const events = await EventModel.find(query)
       .sort({ [_sort]: sortOrder })
       .skip(_start)
       .limit(_end - _start);
 
     // Transform _id to id for React Admin
-    const transformedEvents = events.map(event => ({
+    const transformedEvents = events.map((event) => ({
       ...event.toObject(),
       id: event._id.toString(),
     }));
@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(transformedEvents, {
       headers: {
         'X-Total-Count': total.toString(),
-        'Access-Control-Expose-Headers': 'X-Total-Count'
-      }
+        'Access-Control-Expose-Headers': 'X-Total-Count',
+      },
     });
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -55,16 +55,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
-    
+
     const body = await request.json();
     const event = await EventModel.create(body);
-    
-    return NextResponse.json({
-      ...event.toObject(),
-      id: event._id.toString(),
-    }, { status: 201 });
+
+    return NextResponse.json(
+      {
+        ...event.toObject(),
+        id: event._id.toString(),
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error('Error creating event:', error);
     return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });
   }
-} 
+}

@@ -1,4 +1,5 @@
-import { DataProvider, fetchUtils } from 'react-admin';
+import type { DataProvider } from 'react-admin';
+import { fetchUtils } from 'react-admin';
 
 const apiUrl = '/api/admin';
 const httpClient = fetchUtils.fetchJson;
@@ -7,7 +8,7 @@ export const dataProvider: DataProvider = {
   getList: (resource, params) => {
     const { page = 1, perPage = 10 } = params.pagination || {};
     const { field = 'id', order = 'ASC' } = params.sort || {};
-    
+
     const query: Record<string, string> = {
       _sort: field,
       _order: order,
@@ -44,7 +45,7 @@ export const dataProvider: DataProvider = {
   getManyReference: (resource, params) => {
     const { page = 1, perPage = 10 } = params.pagination || {};
     const { field = 'id', order = 'ASC' } = params.sort || {};
-    
+
     const query: Record<string, string> = {
       _sort: field,
       _order: order,
@@ -97,4 +98,4 @@ export const dataProvider: DataProvider = {
       method: 'DELETE',
     }).then(({ json }) => ({ data: json }));
   },
-}; 
+};

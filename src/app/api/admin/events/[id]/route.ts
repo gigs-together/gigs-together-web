@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { EventModel } from '@/models/Event';
 
@@ -13,12 +14,12 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     await dbConnect();
-    
+
     const event = await EventModel.findById(params.id);
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({
       ...event.toObject(),
       id: event._id.toString(),
@@ -32,18 +33,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     await dbConnect();
-    
+
     const body = await request.json();
-    const event = await EventModel.findByIdAndUpdate(
-      params.id,
-      body,
-      { new: true, runValidators: true }
-    );
-    
+    const event = await EventModel.findByIdAndUpdate(params.id, body, {
+      new: true,
+      runValidators: true,
+    });
+
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({
       ...event.toObject(),
       id: event._id.toString(),
@@ -57,12 +57,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     await dbConnect();
-    
+
     const event = await EventModel.findByIdAndDelete(params.id);
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({
       ...event.toObject(),
       id: event._id.toString(),
@@ -71,4 +71,4 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     console.error('Error deleting event:', error);
     return NextResponse.json({ error: 'Failed to delete event' }, { status: 500 });
   }
-} 
+}

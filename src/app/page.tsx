@@ -7,19 +7,28 @@ import { toLocalYMD } from '@/lib/utils';
 import './style.css';
 import { MonthSection } from './components/MonthSection';
 import { Card } from './components/GigCard';
-import { Event } from '@/types';
+import type { Event } from '@/types';
 import { FaRegCalendar } from 'react-icons/fa';
 
 const DEFAULT_LOCALE = 'en-US';
 
 const formatMonthTitle = (date: string): string => {
-  return new Date(date).toLocaleString(DEFAULT_LOCALE, { month: 'long' }) + ' ' + date.split('-')[0].replace(/20/, '2k');
+  return (
+    new Date(date).toLocaleString(DEFAULT_LOCALE, { month: 'long' }) +
+    ' ' +
+    date.split('-')[0].replace(/20/, '2k')
+  );
 };
 
 const formatFullDate = (dateString?: string) => {
   if (!dateString) return '';
   const d = new Date(dateString);
-  return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(DEFAULT_LOCALE, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 };
 
 function useHeaderHeight(selector = '[data-app-header]', fallback = 44) {
@@ -123,10 +132,12 @@ export default function Home() {
   }, [events]);
 
   const months = useMemo(() => {
-    return Object.keys(eventsByMonth).sort().map((date) => ({
-      date: date + '-01',
-      events: eventsByMonth[date],
-    }));
+    return Object.keys(eventsByMonth)
+      .sort()
+      .map((date) => ({
+        date: date + '-01',
+        events: eventsByMonth[date],
+      }));
   }, [eventsByMonth]);
 
   const computeActiveDate = useCallback(() => {
@@ -134,12 +145,12 @@ export default function Home() {
     const anchors = anchorsRef.current;
     if (!anchors || anchors.length === 0) return;
 
-    const withTop = anchors.map(el => ({ el, top: el.getBoundingClientRect().top - headerH }));
-    const firstBelow = withTop.filter(x => x.top >= 0).sort((a, b) => a.top - b.top)[0];
-    const closestAbove = withTop.filter(x => x.top < 0).sort((a, b) => b.top - a.top)[0];
+    const withTop = anchors.map((el) => ({ el, top: el.getBoundingClientRect().top - headerH }));
+    const firstBelow = withTop.filter((x) => x.top >= 0).sort((a, b) => a.top - b.top)[0];
+    const closestAbove = withTop.filter((x) => x.top < 0).sort((a, b) => b.top - a.top)[0];
     const targetEl = (closestAbove ?? firstBelow)?.el as HTMLElement | undefined;
     const dateAttr = targetEl?.dataset.date;
-    if (dateAttr) setRawVisibleEventDate(prev => (prev === dateAttr ? prev : dateAttr));
+    if (dateAttr) setRawVisibleEventDate((prev) => (prev === dateAttr ? prev : dateAttr));
   }, []);
 
   // Observe anchors list after events render and compute initial active date
@@ -152,7 +163,8 @@ export default function Home() {
 
   // Scroll + resize handler using rAF for stability
   useEffect(() => {
-    let ticking = false, frameId: number | undefined;
+    let ticking = false,
+      frameId: number | undefined;
 
     const onScrollOrResize = () => {
       if (ticking) return;
@@ -172,8 +184,6 @@ export default function Home() {
       if (frameId) {
         cancelAnimationFrame(frameId);
       }
-      ;
-
     };
   }, [computeActiveDate]);
 
@@ -220,7 +230,7 @@ export default function Home() {
 
     // Fallback: if there is no anchor, jump to the first card for this date
     if (!target) {
-      const firstEvent = events.find(e => e.date === key);
+      const firstEvent = events.find((e) => e.date === key);
       if (firstEvent) {
         target = eventRefs.current.get(String(firstEvent.id)) || null;
       }
@@ -233,10 +243,17 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <Header earliestEventDate={visibleEventDate} onDayClick={handleDayClick} availableDates={availableDates} />
-      <main className={styles.main} ref={(el) => {
-        if (el) scrollContainerRef.current = el;
-      }}>
+      <Header
+        earliestEventDate={visibleEventDate}
+        onDayClick={handleDayClick}
+        availableDates={availableDates}
+      />
+      <main
+        className={styles.main}
+        ref={(el) => {
+          if (el) scrollContainerRef.current = el;
+        }}
+      >
         <div className="px-8 md:px-16 py-8">
           {events.length === 0 ? (
             <div className="text-center py-12">
@@ -246,7 +263,7 @@ export default function Home() {
           ) : (
             months.map((day) => {
               const eventsByDay: Record<string, Event[]> = {};
-              day.events.forEach(ev => {
+              day.events.forEach((ev) => {
                 eventsByDay[ev.date] = eventsByDay[ev.date] || [];
                 eventsByDay[ev.date].push(ev);
               });
@@ -254,11 +271,7 @@ export default function Home() {
               const orderedDates = Object.keys(eventsByDay).sort();
 
               return (
-                <MonthSection
-                  key={day.date}
-                  title={formatMonthTitle(day.date)}
-                  date={day.date}
-                >
+                <MonthSection key={day.date} title={formatMonthTitle(day.date)} date={day.date}>
                   {orderedDates.map((dateStr, i) => (
                     <div key={dateStr} className="contents">
                       {i === 0 ? (
@@ -273,8 +286,7 @@ export default function Home() {
                             data-date={dateStr}
                             className="w-full border-b border-gray-200 my-6 relative scroll-mt-[calc(var(--header-h)-_10px)]"
                           >
-                            <span
-                              className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[20ch]">
+                            <span className="inline-flex items-center gap-2 text-base leading-none font-normal text-gray-800 px-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[20ch]">
                               <FaRegCalendar className="text-gray-600" />
                               {formatFullDate(dateStr)}
                             </span>
@@ -293,7 +305,6 @@ export default function Home() {
                       ))}
                     </div>
                   ))}
-
                 </MonthSection>
               );
             })
@@ -302,4 +313,4 @@ export default function Home() {
       </main>
     </div>
   );
-};
+}
