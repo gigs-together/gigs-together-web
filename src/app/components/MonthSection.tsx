@@ -1,11 +1,11 @@
 import React from 'react';
-import { useRef } from "react";
+import { useRef } from 'react';
 
 type MonthSectionProps = {
-  children: React.ReactNode,
-  title: string,
-  date: string,
-}
+  children: React.ReactNode;
+  title: string;
+  date: string;
+};
 
 export function MonthSection({ children, title, date }: MonthSectionProps) {
   const dayRef = useRef<HTMLDivElement>(null);
@@ -21,5 +21,5 @@ export function MonthSection({ children, title, date }: MonthSectionProps) {
         {children}
       </div>
     </div>
-  )
+  );
 }

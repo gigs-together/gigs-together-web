@@ -54,15 +54,20 @@ interface TicketmasterEvent {
 // Function to transform Ticketmaster event to our schema
 function transformTicketmasterEvent(tmEvent: TicketmasterEvent) {
   const venue = tmEvent._embedded?.venues?.[0];
-  const image = tmEvent.images?.find((img: TicketmasterImage) => img.width >= 300)?.url || tmEvent.images?.[0]?.url || '';
-  
+  const image =
+    tmEvent.images?.find((img: TicketmasterImage) => img.width >= 300)?.url ||
+    tmEvent.images?.[0]?.url ||
+    '';
+
   return {
     id: `tm_${tmEvent.id}`,
     date: tmEvent.dates?.start?.localDate || tmEvent.dates?.start?.dateTime || '',
     cover: image,
     title: tmEvent.name || 'Untitled Event',
     people: tmEvent.salesInfo?.attendance?.current || 0,
-    venueAddress: venue ? `${venue.name}, ${venue.city?.name || ''}, ${venue.address?.line1 || ''}`.trim() : 'TBA',
+    venueAddress: venue
+      ? `${venue.name}, ${venue.city?.name || ''}, ${venue.address?.line1 || ''}`.trim()
+      : 'TBA',
     published: false, // Default to unpublished
     ticketmasterId: tmEvent.id,
   };
@@ -81,54 +86,52 @@ async function fetchAllEvents() {
 
     console.log('Fetching events from Ticketmaster API...');
 
-  do {
-    const params = new URLSearchParams({
-      apikey: API_KEY,
-      locale: '*',
-      size: '200', // Maximum allowed by Ticketmaster API
-      sort: 'date,asc',
-      city: 'barcelona',
-      domain: 'spain',
-      page: page.toString()
-    });
-
-    const url = `${BASE_URL}?${params}`;
-    
-    try {
-      console.log(`Fetching page ${page + 1}...`);
-      
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json'
-        }
+    do {
+      const params = new URLSearchParams({
+        apikey: API_KEY,
+        locale: '*',
+        size: '200', // Maximum allowed by Ticketmaster API
+        sort: 'date,asc',
+        city: 'barcelona',
+        domain: 'spain',
+        page: page.toString(),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const url = `${BASE_URL}?${params}`;
 
-      const data = await response.json();
+      try {
+        console.log(`Fetching page ${page + 1}...`);
 
-      if (data._embedded && data._embedded.events) {
-        allEvents.push(...data._embedded.events);
-        console.log(`Found ${data._embedded.events.length} events on page ${page + 1}`);
-      }
+        const response = await fetch(url, {
+          headers: {
+            Accept: 'application/json',
+          },
+        });
 
-      // Update pagination info
-      if (data.page) {
-        totalPages = data.page.totalPages || 1;
-        page = data.page.number + 1;
-      } else {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data._embedded && data._embedded.events) {
+          allEvents.push(...data._embedded.events);
+          console.log(`Found ${data._embedded.events.length} events on page ${page + 1}`);
+        }
+
+        // Update pagination info
+        if (data.page) {
+          totalPages = data.page.totalPages || 1;
+          page = data.page.number + 1;
+        } else {
+          break;
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error(`Error fetching page ${page + 1}:`, errorMessage);
         break;
       }
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      console.error(`Error fetching page ${page + 1}:`, errorMessage);
-      break;
-    }
-
-  } while (page < totalPages);
+    } while (page < totalPages);
 
     console.log(`\nTotal events fetched: ${allEvents.length}`);
 
@@ -141,17 +144,17 @@ async function fetchAllEvents() {
       try {
         // Check if event already exists
         const existingEvent = await EventModel.findOne({ ticketmasterId: tmEvent.id });
-        
+
         if (existingEvent) {
           // Event already exists, skip it
           skippedCount++;
           continue;
         }
-        
+
         // Only create new events
         const transformedEvent = transformTicketmasterEvent(tmEvent);
         const result = await EventModel.create(transformedEvent);
-        
+
         if (result) {
           savedCount++;
         }
@@ -170,7 +173,6 @@ async function fetchAllEvents() {
     const outputPath = path.join(__dirname, '../src/app/events.json');
     fs.writeFileSync(outputPath, JSON.stringify(allEvents, null, 2));
     console.log(`📁 Backup saved to ${outputPath}`);
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('❌ Error in fetchAllEvents:', errorMessage);
@@ -181,4 +183,4 @@ async function fetchAllEvents() {
 }
 
 // Run the script
-fetchAllEvents().catch(console.error); 
+fetchAllEvents().catch(console.error);

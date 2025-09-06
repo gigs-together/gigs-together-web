@@ -100,4 +100,4 @@ export const EventShow = () => (
       <TextField source="ticketmasterId" />
     </SimpleShowLayout>
   </Show>
-); 
+);

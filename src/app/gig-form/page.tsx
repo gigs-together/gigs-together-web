@@ -34,7 +34,7 @@ const formSchema = z.object({
   }),
 });
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 export default function GigForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -92,7 +92,9 @@ export default function GigForm() {
       <Card className="w-full max-w-md m-auto">
         <CardHeader>
           <CardTitle>Suggest a gig</CardTitle>
-          <CardDescription>Looking for a gig company? Let us know which gig should we announce!</CardDescription>
+          <CardDescription>
+            Looking for a gig company? Let us know which gig should we announce!
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -105,9 +107,7 @@ export default function GigForm() {
                     <FormControl>
                       <Input placeholder="Gig title" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Enter the title of a gig.
-                    </FormDescription>
+                    <FormDescription>Enter the title of a gig.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -120,9 +120,7 @@ export default function GigForm() {
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Select the date of a gig.
-                    </FormDescription>
+                    <FormDescription>Select the date of a gig.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -135,9 +133,7 @@ export default function GigForm() {
                     <FormControl>
                       <Input placeholder="Location" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Enter location for a gig.
-                    </FormDescription>
+                    <FormDescription>Enter location for a gig.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -150,9 +146,7 @@ export default function GigForm() {
                     <FormControl>
                       <Input placeholder="Ticket URL" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Enter the URL where tickets can be purchased.
-                    </FormDescription>
+                    <FormDescription>Enter the URL where tickets can be purchased.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

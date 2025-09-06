@@ -9,4 +9,4 @@ const AdminApp = dynamic(() => import('@/components/AdminApp'), {
 
 export default function AdminPage() {
   return <AdminApp />;
-} 
+}

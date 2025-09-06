@@ -15,15 +15,13 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: 'Gigs Together',
-  description: 'Let\'s go',
+  description: "Let's go",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-    <body className={`${geistSans.variable} ${geistMono.variable}`}>
-    {children}
-    </body>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
     </html>
   );
 }

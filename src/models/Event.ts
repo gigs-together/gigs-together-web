@@ -2,7 +2,7 @@ import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import mongoose from 'mongoose';
 
 @modelOptions({
-  schemaOptions: { collection: 'events' }
+  schemaOptions: { collection: 'events' },
 })
 export class Event {
   @prop({ required: true, type: String })
@@ -28,4 +28,4 @@ export class Event {
 }
 
 // Check if model already exists to prevent OverwriteModelError
-export const EventModel = mongoose.models.Event || getModelForClass(Event); 
+export const EventModel = mongoose.models.Event || getModelForClass(Event);

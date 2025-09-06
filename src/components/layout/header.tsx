@@ -14,13 +14,15 @@ export default function Header({ earliestEventDate, onDayClick, availableDates }
       <div className="w-full px-4 py-2">
         <div className="flex items-center w-full">
           <div className="basis-0 flex-1 shrink-1">
-            <h1 className="text-xl font-semibold">
-              Gigs Together
-            </h1>
+            <h1 className="text-xl font-semibold">Gigs Together</h1>
           </div>
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
-            <TopForm visibleEventDate={earliestEventDate} onDayClick={onDayClick} availableDates={availableDates} />
+            <TopForm
+              visibleEventDate={earliestEventDate}
+              onDayClick={onDayClick}
+              availableDates={availableDates}
+            />
           </div>
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4 basis-0 flex-1 shrink-1 justify-end">

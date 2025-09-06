@@ -89,7 +89,11 @@ export const UserEdit = () => (
       <TextInput source="email" validate={[required()]} />
       <TextInput source="firstName" validate={[required()]} />
       <TextInput source="lastName" validate={[required()]} />
-      <TextInput source="password" type="password" helperText="Leave blank to keep current password" />
+      <TextInput
+        source="password"
+        type="password"
+        helperText="Leave blank to keep current password"
+      />
       <SelectInput
         source="role"
         choices={[
@@ -113,4 +117,4 @@ export const UserShow = () => (
       <DateField source="createdAt" showTime />
     </SimpleShowLayout>
   </Show>
-); 
+);

@@ -2,14 +2,13 @@ import { getModelForClass, prop, pre, modelOptions } from '@typegoose/typegoose'
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-@pre<User>('save', async function() {
+@pre<User>('save', async function () {
   if (this.isModified('password') && this.password) {
     this.password = await bcrypt.hash(this.password, 12);
   }
 })
-
 @modelOptions({
-  schemaOptions: { collection: 'users' }
+  schemaOptions: { collection: 'users' },
 })
 export class User {
   @prop({ required: true, unique: true, type: String })
@@ -37,4 +36,4 @@ export class User {
 }
 
 // Check if model already exists to prevent OverwriteModelError
-export const UserModel = mongoose.models.User || getModelForClass(User); 
+export const UserModel = mongoose.models.User || getModelForClass(User);

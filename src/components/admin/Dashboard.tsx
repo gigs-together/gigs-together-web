@@ -9,11 +9,12 @@ export default function Dashboard() {
           <CardContent className="p-6">
             <CardTitle className="text-lg mb-2">Welcome</CardTitle>
             <p className="text-gray-600">
-              Welcome to the Gigs Together admin panel. Use the navigation menu to manage users and events.
+              Welcome to the Gigs Together admin panel. Use the navigation menu to manage users and
+              events.
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <CardTitle className="text-lg mb-2">Quick Actions</CardTitle>
@@ -27,16 +28,14 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <CardTitle className="text-lg mb-2">System Status</CardTitle>
-            <div className="text-green-600">
-              ✓ All systems operational
-            </div>
+            <div className="text-green-600">✓ All systems operational</div>
           </CardContent>
         </Card>
       </div>
     </div>
   );
-} 
+}
