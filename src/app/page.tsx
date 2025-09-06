@@ -59,6 +59,9 @@ export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Raw date from observer (updates on every scroll tick)
+  const [rawVisibleEventDate, setRawVisibleEventDate] = useState<string | undefined>();
+  // Debounced date passed to the header (stabilized)
   const [visibleEventDate, setVisibleEventDate] = useState<string | undefined>();
 
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -71,6 +74,16 @@ export default function Home() {
     for (const e of events) set.add(e.date);
     return Array.from(set).sort();
   }, [events]);
+
+  // Debounce raw visible date changes to avoid header jitter while scrolling
+  useEffect(() => {
+    if (!rawVisibleEventDate) {
+      setVisibleEventDate(undefined);
+      return;
+    }
+    const id = setTimeout(() => setVisibleEventDate(rawVisibleEventDate), 150);
+    return () => clearTimeout(id);
+  }, [rawVisibleEventDate]);
 
   useEffect(() => {
     headerOffsetHeightRef.current = headerH;
@@ -158,7 +171,7 @@ export default function Home() {
 
     const eventId = (targetEl as HTMLElement).dataset.eventId ?? '';
     const event = events.find(e => String(e.id) === eventId);
-    if (event) setVisibleEventDate(event.date);
+    if (event) setRawVisibleEventDate(event.date);
   }, [events]);
 
   // Set up intersection observer to track visible events
