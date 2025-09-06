@@ -4,50 +4,52 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
-import prettierPlugin from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
 import stylistic from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
-
-// ignorePatterns: [
-//   'tailwind.config.js',
-//   'src/components/ui/**/*',
-// ],
-//   globals: {
-//   Telegram: 'readonly',
-// },
-// extends: [
-//   'next/core-web-vitals',
-//   'next/typescript',
-// ],
+import nextPlugin from '@next/eslint-plugin-next';
 
 export default tseslint.config(
-  { ignores: ['dist', '**/*debug*'] },
   {
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      prettier,
+    ignores: [
+      'dist',
+      '.next',
+      'node_modules',
+      '**/*debug*',
+      'src/components/ui/**/*',
+      'tailwind.config.js',
     ],
-    files: ['**/*.{ts,tsx}'],
+  },
+
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: { ...globals.browser, Telegram: 'readonly' },
+    },
+    settings: {
+      react: { version: 'detect' },
+      'import/resolver': {
+        typescript: true,
+        node: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+      },
     },
     plugins: {
       react,
+      '@next/next': nextPlugin,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      prettier: prettierPlugin,
       '@stylistic': stylistic,
       import: importPlugin,
     },
     rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react/jsx-tag-spacing': [
         'error',
         {
@@ -90,4 +92,5 @@ export default tseslint.config(
       ],
     },
   },
+  prettier,
 );
