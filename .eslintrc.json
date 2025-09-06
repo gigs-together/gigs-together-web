@@ -1,5 +1,0 @@
-{
-  "ignorePatterns": ["tailwind.config.js", "src/components/ui/**/*"],
-  "globals": { "Telegram": "readonly" },
-  "extends": ["next/core-web-vitals", "next/typescript"]
-}
